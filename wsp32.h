@@ -10,16 +10,14 @@
 #include <iomanip>
 #include <fstream>
 #include "wake_lib/crc8.h"
-#include "inc/crc32.h"
-#include "inc/optionsParser.h"
-#include "inc/BootloaderDefines.h"
+#include "crc32.h"
 
 using std::string;
 using std::cout;
 using std::endl;
 
 using namespace Crc32_CompileTime;
-using namespace WkBoot;
+//using namespace WkBoot;
 
 struct Packet_t
 {
@@ -37,29 +35,6 @@ struct Packet_t
 	uint8_t n;
 	std::array<uint8_t, 160> payload;
 };
-
-namespace Utils {
-	constexpr static uint16_t htons(uint16_t val)
-	{
-		return (val & 0xFF00) >> 8
-			| (val & 0x00FF) << 8;
-	}
-	constexpr static uint32_t htonl(uint32_t val)
-	{
-		return  (val & 0xFF000000) >> 24
-			| (val & 0x00FF0000) >> 8
-			| (val & 0x0000FF00) << 8
-			| (val & 0x000000FF) << 24;
-	}
-	constexpr static uint16_t ntohs(uint16_t val)
-	{
-		return htons(val);
-	}
-	constexpr static uint32_t ntohl(uint32_t val)
-	{
-		return  htonl(val);
-	}
-}
 
 class Wake
 {
@@ -255,7 +230,7 @@ private:
 		unsigned char N, unsigned char *Data);
 
 };
-
+#if 0
 class WakeBoot : public Wake
 {
 private:
@@ -541,7 +516,7 @@ public:
 
 	}
 };
-
+#endif
 
 
 

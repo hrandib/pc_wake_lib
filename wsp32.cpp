@@ -6,7 +6,8 @@ using namespace Mcudrv;
 //----------------------- Access check for COM resource: --------------------
 
 bool Wake::AccessCOM(char *P)
-{ HANDLE hTemp = CreateFile(P,
+{ 
+	HANDLE hTemp = CreateFile(P,
                     GENERIC_READ | GENERIC_WRITE,
                     0,
                     NULL,
