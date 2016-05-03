@@ -13,14 +13,77 @@
 
 #include "wake_lib/crc8.h"
 
-using std::string;
-using std::cout;
-using std::endl;
-
-//using namespace Crc32_CompileTime;
-//using namespace WkBoot;
-
 namespace Wk {
+
+#ifdef DEBUG_MODE
+	union DebugInfo
+	{
+		struct
+		{
+			unsigned txSuccess : 1;
+			unsigned rxSuccess : 1;
+			unsigned timeoutSuccess : 1;
+			unsigned syncSuccess : 1;
+			unsigned crcSuccess : 1;
+			unsigned staffingSuccess : 1;
+		};
+		operator bool()
+		{
+			return data != 0x3F;
+		}
+		void Print()
+		{
+			using namespace std;
+			cout.setf(cout.boolalpha);
+			cout << "TX success: " << (bool)txSuccess << endl;
+			cout << "RX success: " << (bool)rxSuccess << endl;
+			cout << "Timeout success: " << (bool)timeoutSuccess << endl;
+			cout << "Sync success:" << (bool)syncSuccess << endl;
+			cout << "CRC success: " << (bool)crcSuccess << endl;
+			cout << "Staffing success: " << (bool)staffingSuccess << endl;
+			cout.unsetf(cout.boolalpha);
+		}
+	private:
+		uint32_t data;
+	};
+#endif
+
+	enum Cmd
+	{
+		C_NOP,    //нет операции
+		C_ERR,    //ошибка приема пакета
+		C_ECHO,    //передать эхо
+		C_GETINFO,
+		C_SETNODEADDRESS,
+		C_SETGROUPADDRESS,
+		C_SAVESETTINGS,
+		C_GETOPTIME,
+		C_OFF,
+		C_ON
+	};
+	enum Err
+	{
+		ERR_NO,	//no error
+		ERR_TX,	//Rx/Tx error
+		ERR_BU,	//device busy error
+		ERR_RE,	//device not ready error
+		ERR_PA,	//parameters value error
+		ERR_NI,	//Command not impl
+		ERR_NR,	//no replay
+		ERR_NC,	//no carrier
+		ERR_ADDRFMT,	//new address is wrong
+		ERR_EEPROMUNLOCK //EEPROM wasn't unlocked
+	};
+	enum DeviceType {
+		T_LED_DRIVER,
+		T_POWER_SWITCH,
+		T_RGB_LED_DRIVER,
+		T_GENERIC_IO,
+		T_SENSOR,
+		T_POWER_SUPPLY,
+		T_RESERVED,
+		T_CUSTOM_DEVICE
+	};
 
 	struct Packet_t
 	{
@@ -38,72 +101,24 @@ namespace Wk {
 		uint8_t n;
 		std::array<uint8_t, 160> payload;
 	};
+	
+	using std::string;
+	using std::cout;
+	using std::endl;
 
+	void PrintDevicesInfo(uint8_t* data);
+	const char* GetErrorString(Err err);
+	
 	class Wake
 	{
-	public:
-		union DebugInfo
-		{
-			struct
-			{
-				unsigned txSuccess : 1;
-				unsigned rxSuccess : 1;
-				unsigned timeoutSuccess : 1;
-				unsigned syncSuccess : 1;
-				unsigned crcSuccess : 1;
-				unsigned staffingSuccess : 1;
-			};
-			operator bool()
-			{
-				return data != 0x3F;
-			}
-			void Print()
-			{
-				using namespace std;
-				cout.setf(cout.boolalpha);
-				cout << "TX success: " << (bool)txSuccess << endl;
-				cout << "RX success: " << (bool)rxSuccess << endl;
-				cout << "Timeout success: " << (bool)timeoutSuccess << endl;
-				cout << "Sync success:" << (bool)syncSuccess << endl;
-				cout << "CRC success: " << (bool)crcSuccess << endl;
-				cout << "Staffing success: " << (bool)staffingSuccess << endl;
-				cout.unsetf(cout.boolalpha);
-			}
-		private:
-			uint32_t data;
-		};
 	private:
 		uint8_t TxCrc_, RxCrc_;
 		const string portName_;
 		DWORD baud_;
+#ifdef DEBUG_MODE
 		DebugInfo debugInfo_{};
+#endif
 	public:
-		enum Cmd
-		{
-			C_NOP,    //нет операции
-			C_ERR,    //ошибка приема пакета
-			C_ECHO,    //передать эхо
-			C_GETINFO,
-			C_SETNODEADDRESS,
-			C_SETGROUPADDRESS,
-			C_SAVESETTINGS,
-			C_GETOPTIME,
-			C_OFF,
-			C_ON
-		};
-		enum Err
-		{
-			ERR_NO,	//no error
-			ERR_TX,	//Rx/Tx error
-			ERR_BU,	//device busy error
-			ERR_RE,	//device not ready error
-			ERR_PA,	//parameters value error
-			ERR_NI,	//Command not impl
-			ERR_NR,	//no replay
-			ERR_NC,	//no carrier
-			ERR_ADDRFMT,	//new address is wrong
-			ERR_EEPROMUNLOCK //EEPROM wasn't unlocked
-		};
 		Wake(const char *portName, const DWORD baud) : portName_("//./" + string(portName)), baud_(baud), TxCrc_(0), RxCrc_(0)
 		{
 			//		connected = OpenCOM(portName, baud);
@@ -112,27 +127,6 @@ namespace Wk {
 		{
 			//		std::string temp = "//./" + portName;
 			//		connected = OpenCOM(temp.c_str(), baud);
-		}
-		const char* GetErrorString(Err err)
-		{
-			switch(err) {
-			case ERR_NO:
-				return "OK";
-			case ERR_BU:
-				return "Device Busy";
-			case ERR_RE:
-				return "Device Not Ready";
-			case ERR_PA:
-				return "Command Parameters Is Incorrect";
-			case ERR_NI:
-				return "Command Not Implemented";
-			case ERR_ADDRFMT:
-				return "New Address Is Incorrect";
-			case ERR_EEPROMUNLOCK:
-				return "EEPROM Unlocking Error";
-			default:
-				return "Unknown Error";
-			}
 		}
 		bool IsConnected() const
 		{
@@ -151,6 +145,7 @@ namespace Wk {
 		{
 			return TxFrame(packet.addr, packet.cmd, packet.n, packet.payload.data());
 		}
+#ifndef DEBUG_MODE
 		bool Request(Packet_t &packet, uint32_t To)
 		{
 			if(TxFrame(packet) && RxFrame(packet, To))
@@ -159,7 +154,8 @@ namespace Wk {
 			}
 			return false;
 		}
-		auto DebugRequest(Packet_t &packet, uint32_t To)
+#else //DEBUG_MODE
+		auto Request(Packet_t &packet, uint32_t To)
 		{
 			if(TxFrame(packet))
 			{
@@ -176,6 +172,7 @@ namespace Wk {
 			}
 			return debugInfo_;
 		}
+#endif
 		uint8_t GetTxCrc()
 		{
 			return TxCrc_;
@@ -184,7 +181,6 @@ namespace Wk {
 		{
 			return RxCrc_;
 		}
-
 		~Wake()
 		{
 			CloseCOM();
@@ -203,7 +199,6 @@ namespace Wk {
 		DCB           dcbc;       //DCB copy
 		COMMTIMEOUTS  ComTo;      //COM timeouts
 		COMMTIMEOUTS  ComToc;     //COM timeouts copy
-
 		static const unsigned char
 			FEND = 0xC0,            //Frame END
 			FESC = 0xDB,            //Frame ESCape
@@ -231,7 +226,6 @@ namespace Wk {
 
 		bool TxFrame(unsigned char ADDR, unsigned char CMD,
 			unsigned char N, unsigned char *Data);
-
 	};
 
 }//Wk
@@ -253,26 +247,6 @@ private:
 	};
 	OptionsParser& parser_;
 	Packet_t params_;
-	bool PrintDevicesInfo()
-	{
-		constexpr static std::array<const char*, 8> deviceClasses = {	"LED Driver", "Power Switch",
-																																"RGB LED Driver", "Generic IO",
-																																"Sensor", "Power Supply"};
-		params_.cmd = C_GETINFO;
-		params_.addr = parser_.GetAddress();
-		params_.n = 0;
-		if(!Request(params_, 50)) {
-			cout << "Get device info not succeed\r\n";
-			return false;
-		}
-		for(size_t i{}; i < deviceClasses.size(); ++i) {
-			auto availableDevicesMask = params_.payload[0];
-			if(availableDevicesMask & (1U << i)) {
-				cout << deviceClasses[i] << "\r\n";
-			}
-		}
-		return true;
-	}
 	bool SendRebootCommand()
 	{
 		using namespace Utils;

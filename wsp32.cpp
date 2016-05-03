@@ -118,20 +118,6 @@ namespace Wk {
 		return WaitCommEvent(hCom, lpEvtMask, NULL) != 0;
 	}
 
-	//---------------------------------------------------------------------------
-
-	// void __fastcall Wake::DowCRC(unsigned char b, unsigned char &crc)
-	// { for (int i = 0; i < 8; i++)
-	//   {
-	//    if (((b ^ crc) & 1) != 0)
-	//      crc = ((crc ^ 0x18) >> 1) | 0x80;
-	//        else crc = (crc >> 1) & ~0x80;
-	//    b = b >> 1;
-	//    }
-	// }
-
-	//---------------------------------------------------------------------------
-
 	bool Wake::SendData(const uint8_t* data, uint32_t size)
 	{
 		DWORD written;
@@ -159,27 +145,35 @@ namespace Wk {
 		if(!SetCommTimeouts(hCom, &ComTo)) {
 			return 0; //set timeouts error
 		}
+#ifdef DEBUG_MODE
 		debugInfo_.timeoutSuccess = true;
+#endif
 		for(i = 0; i < 512 && b != FEND; i++) {
 			if(!ReceiveByte(b))     break;                //frame synchronization
 		}
 		if(b != FEND) {
 			return 0;             //timeout or sync error
 		}
+#ifdef DEBUG_MODE
 		else {
 			debugInfo_.syncSuccess = true;
 		}
 		debugInfo_.staffingSuccess = true;
+#endif
 		crc(b);                               //update CRC
 		N = ADD = 0;
 		for(i = -3; i <= N; i++) {
 			if(!ReceiveByte(b)) {
+#ifdef DEBUG_MODE
 				debugInfo_.syncSuccess = false;
+#endif
 				break;                //timeout error
 			}
 			if(b == FESC) {
 				if(!ReceiveByte(b)) {
+#ifdef DEBUG_MODE
 					debugInfo_.syncSuccess = false;
+#endif
 					break;                //timeout error
 				}
 				else {
@@ -190,7 +184,9 @@ namespace Wk {
 						b = FESC;              //TFESC <- FESC
 					}
 					else {
+#ifdef DEBUG_MODE
 						debugInfo_.staffingSuccess = false;
+#endif
 						break;
 					}
 				}
@@ -223,7 +219,9 @@ namespace Wk {
 			}
 			crc(b);           //update CRC
 		}
+#ifdef DEBUG_MODE
 		debugInfo_.crcSuccess = !crc.GetResult();
+#endif
 		return ((i == N + 1) && !crc.GetResult());                    //RX or CRC error
 	}
 
@@ -270,4 +268,43 @@ namespace Wk {
 		//	bool x = WriteFile(hCom, Buff, j, &r, NULL) != 0;  //TX frame
 		return SendData(Buff, j);
 	}
+	
+	void PrintDevicesInfo(uint8_t* data)
+	{
+		constexpr static std::array<const char*, 8> deviceClasses = {"LED Driver", "Power Switch",
+																														"RGB LED Driver", "Generic IO",
+																														"Sensor", "Power Supply",
+																														"Reserved", "Custom Device"};
+		cout << "Protocol Version Number: " << ((uint32_t)data[1] & 0x0F) << "\r\n";
+		auto deviceMask = *data;
+		cout << "Available devices: \r\n";
+		for(size_t i{}; i < deviceClasses.size(); ++i) {
+			if(deviceMask & (1U << i)) {
+				cout << "\t\t" << deviceClasses[i] << "\r\n";
+			}
+		}
+	}
+
+	const char* GetErrorString(Err err)
+	{
+		switch(err) {
+		case ERR_NO:
+			return "OK";
+		case ERR_BU:
+			return "Device Busy";
+		case ERR_RE:
+			return "Device Not Ready";
+		case ERR_PA:
+			return "Command Parameters Is Incorrect";
+		case ERR_NI:
+			return "Command Not Implemented";
+		case ERR_ADDRFMT:
+			return "New Address Is Incorrect";
+		case ERR_EEPROMUNLOCK:
+			return "EEPROM Unlocking Error";
+		default:
+			return "Unknown Error";
+		}
+	}
+
 }//Wk
