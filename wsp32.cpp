@@ -274,7 +274,7 @@ namespace Wk {
 		packet.cmd = C_GETINFO;
 		packet.n = 0; //common request
 		if(!Request(packet, 50)) {
-			std::cerr << ">>> Common Info request failed\r\n";
+			std::cerr << ">>> Common Info request failed (maybe bootloader already running)\r\n";
 			return false;
 		}
 		if(packet.payload[0]) {
@@ -289,7 +289,7 @@ namespace Wk {
 		cout << "Available devices: \r\n";
 		for(size_t i{}; i < DEV_TYPES_NUMBER - 1; ++i) {
 			if(deviceMask & (1U << i)) {
-				cout << "\t\t" << deviceTypeStr[i] << "\r\n";
+				cout << "\t" << deviceTypeStr[i] << "\r\n";
 				packet.payload[0] = (uint8_t)i; //device select
 				if(!Request(packet, 50)) {
 					std::cerr << ">>> Device Info request failed\r\n";
@@ -298,23 +298,23 @@ namespace Wk {
 				switch(DeviceType(i))
 				{
 				case Wk::DEV_LED_DRIVER:
-					cout << "Channels Number: " << (*data & 0x01 ? 2 : 1) << "\r\n";
-					cout << "Fan Controller present: " << (*data & 0x02 ? "Yes" : "No") << "\r\n";
+					cout << "\t\tChannels Number: " << (*data & 0x01 ? 2 : 1) << "\r\n";
+					cout << "\t\tFan Controller present: " << (*data & 0x02 ? "Yes" : "No") << "\r\n";
 					break;
 				case Wk::DEV_POWER_SWITCH: case Wk::DEV_RGB_LED_DRIVER:
-					cout << "Channels Number: " << (uint32_t)*data << "\r\n";
+					cout << "\t\tChannels Number: " << (uint32_t)*data << "\r\n";
 					break;
 			case Wk::DEV_GENERIC_IO:
-					cout << "Memory area available size: " << (uint32_t)*data << "\r\n";
+					cout << "\t\tMemory area available size: " << (uint32_t)*data << "\r\n";
 					break;
 				case Wk::DEV_SENSOR:
-					cout << "Sensor Type: " << sensorTypeStr[*data] << "\r\n";
+					cout << "\t\tSensor Type: " << sensorTypeStr[*data] << "\r\n";
 					break;
 				case Wk::DEV_POWER_SUPPLY:
-					cout << "Nominal Power: " << (uint32_t)*data << "W\r\n";
+					cout << "\t\tNominal Power: " << (uint32_t)*data << "W\r\n";
 					break;
 				case Wk::DEV_RESERVED:
-					cout << "Reserved" << "\r\n";
+					cout << "\t\tReserved" << "\r\n";
 					break;
 				case Wk::DEV_CUSTOM:
 					break;

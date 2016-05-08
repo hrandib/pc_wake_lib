@@ -23,4 +23,36 @@ namespace Utils {
 	{
 		return  htonl(val);
 	}
+
+	class ProgressBar
+	{
+	private:
+		constexpr static size_t DEFAULT_BAR_LENGTH = 50;
+		const size_t maxVal_;
+		const size_t barLength_;
+		std::string valDimension_;
+		const size_t halfScaleDiv = maxVal_ / (barLength_ * 2);
+	public:
+		ProgressBar(size_t maxVal, const char* valDimension, size_t barLength = 0) : maxVal_(maxVal ? maxVal : 1),
+									barLength_(barLength ? barLength : DEFAULT_BAR_LENGTH), valDimension_(valDimension)
+		{  }
+		void Update(size_t currentValue)
+		{
+			using std::cout;
+			using std::endl;
+			auto position = ((currentValue + halfScaleDiv) * barLength_) / maxVal_ ;
+			cout << "\r[";
+			for(size_t i{}; i < position; ++i) {
+				cout << '=';
+			}
+			for(size_t i = position; i < barLength_; ++i)	{
+				cout << ' ';
+			}
+			cout << "] " << position * 100 / barLength_ << "% " << currentValue << ' ' << valDimension_;
+			if(currentValue == maxVal_) {
+				cout << endl;
+			}
+		}
+	};
+
 }//Utils

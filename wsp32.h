@@ -164,7 +164,7 @@ namespace Wk {
 			return TxFrame(packet.addr, packet.cmd, packet.n, packet.payload.data());
 		}
 #ifndef DEBUG_MODE
-		bool Request(Packet_t& packet, uint32_t To)
+		bool Request(Packet_t& packet, uint32_t To = 50)
 		{
 			if(TxFrame(packet) && RxFrame(packet, To))
 			{
