@@ -74,16 +74,35 @@ namespace Wk {
 		ERR_EEPROMUNLOCK //EEPROM wasn't unlocked
 	};
 	enum DeviceType {
-		T_LED_DRIVER,
-		T_POWER_SWITCH,
-		T_RGB_LED_DRIVER,
-		T_GENERIC_IO,
-		T_SENSOR,
-		T_POWER_SUPPLY,
-		T_RESERVED,
-		T_CUSTOM_DEVICE
+		DEV_LED_DRIVER,
+		DEV_POWER_SWITCH,
+		DEV_RGB_LED_DRIVER,
+		DEV_GENERIC_IO,
+		DEV_SENSOR,
+		DEV_POWER_SUPPLY,
+		DEV_RESERVED,
+		DEV_CUSTOM,
+		DEV_TYPES_NUMBER
 	};
-
+	constexpr static std::array<const char*, DEV_TYPES_NUMBER> deviceTypeStr = {"LED Driver", "Power Switch",
+																															"RGB LED Driver", "Generic IO",
+																															"Sensor", "Power Supply",
+																															"Reserved", "Custom Device"};
+	enum SensorType {
+		SEN_TEMPERATURE,
+		SEN_HUMIDITY,
+		SEN_PRESSURE,
+		SEN_LIGHT,
+		SEN_CO2,
+		SEN_PRESENCE,
+		SEN_WATERLEAK,
+		SEN_TYPES_NUMBER
+	};
+	constexpr static std::array<const char*, SEN_TYPES_NUMBER> sensorTypeStr = {"Temperature", "Humidity",
+																																						"Pressure", "Light",
+																																						"CO2", "Presence",
+																																						"Water Leak"};
+	
 	struct Packet_t
 	{
 		using Self = Packet_t;
@@ -105,7 +124,6 @@ namespace Wk {
 	using std::cout;
 	using std::endl;
 
-	void PrintDevicesInfo(uint8_t* data);
 	const char* GetErrorString(Err err);
 	
 	class Wake
@@ -136,16 +154,17 @@ namespace Wk {
 			connected = OpenCOM(portName_.c_str(), baud_);
 			return connected;
 		}
-		bool RxFrame(Packet_t &packet, uint32_t To)
+		bool GetInfo(Packet_t& packet);
+		bool RxFrame(Packet_t& packet, uint32_t To)
 		{
 			return RxFrame(To, packet.addr, packet.cmd, packet.n, packet.payload.data());
 		}
-		bool TxFrame(Packet_t &packet)
+		bool TxFrame(Packet_t& packet)
 		{
 			return TxFrame(packet.addr, packet.cmd, packet.n, packet.payload.data());
 		}
 #ifndef DEBUG_MODE
-		bool Request(Packet_t &packet, uint32_t To)
+		bool Request(Packet_t& packet, uint32_t To)
 		{
 			if(TxFrame(packet) && RxFrame(packet, To))
 			{

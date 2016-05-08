@@ -269,20 +269,61 @@ namespace Wk {
 		return SendData(Buff, j);
 	}
 	
-	void PrintDevicesInfo(uint8_t* data)
+	bool Wake::GetInfo(Packet_t& packet)
 	{
-		constexpr static std::array<const char*, 8> deviceClasses = {"LED Driver", "Power Switch",
-																														"RGB LED Driver", "Generic IO",
-																														"Sensor", "Power Supply",
-																														"Reserved", "Custom Device"};
+		packet.cmd = C_GETINFO;
+		packet.n = 0; //common request
+		if(!Request(packet, 50)) {
+			std::cerr << ">>> Common Info request failed\r\n";
+			return false;
+		}
+		if(packet.payload[0]) {
+			std::cerr << "Common Info request failed with device response: " << GetErrorString((Err)packet.payload[0]) << endl;
+			return false;
+		}
+		packet.n = 1; //device info request
+		auto data = &packet.payload[1];
+		cout << ">>> User Firmware Information\r\n";
 		cout << "Protocol Version Number: " << ((uint32_t)data[1] & 0x0F) << "\r\n";
 		auto deviceMask = *data;
 		cout << "Available devices: \r\n";
-		for(size_t i{}; i < deviceClasses.size(); ++i) {
+		for(size_t i{}; i < DEV_TYPES_NUMBER - 1; ++i) {
 			if(deviceMask & (1U << i)) {
-				cout << "\t\t" << deviceClasses[i] << "\r\n";
+				cout << "\t\t" << deviceTypeStr[i] << "\r\n";
+				packet.payload[0] = (uint8_t)i; //device select
+				if(!Request(packet, 50)) {
+					std::cerr << ">>> Device Info request failed\r\n";
+					continue;
+				}
+				switch(DeviceType(i))
+				{
+				case Wk::DEV_LED_DRIVER:
+					cout << "Channels Number: " << (*data & 0x01 ? 2 : 1) << "\r\n";
+					cout << "Fan Controller present: " << (*data & 0x02 ? "Yes" : "No") << "\r\n";
+					break;
+				case Wk::DEV_POWER_SWITCH: case Wk::DEV_RGB_LED_DRIVER:
+					cout << "Channels Number: " << (uint32_t)*data << "\r\n";
+					break;
+			case Wk::DEV_GENERIC_IO:
+					cout << "Memory area available size: " << (uint32_t)*data << "\r\n";
+					break;
+				case Wk::DEV_SENSOR:
+					cout << "Sensor Type: " << sensorTypeStr[*data] << "\r\n";
+					break;
+				case Wk::DEV_POWER_SUPPLY:
+					cout << "Nominal Power: " << (uint32_t)*data << "W\r\n";
+					break;
+				case Wk::DEV_RESERVED:
+					cout << "Reserved" << "\r\n";
+					break;
+				case Wk::DEV_CUSTOM:
+					break;
+				default:
+					break;
+				}
 			}
 		}
+		return true;
 	}
 
 	const char* GetErrorString(Err err)
