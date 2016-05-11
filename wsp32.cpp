@@ -284,7 +284,7 @@ namespace Wk {
 		packet.n = 1; //device info request
 		auto data = &packet.payload[1];
 		cout << ">>> User Firmware Information\r\n";
-		cout << "Protocol Version Number: " << ((uint32_t)data[1] & 0x0F) << "\r\n";
+		cout << "Protocol Version: " << ((uint32_t)data[1] & 0x0F) << "\r\n";
 		auto deviceMask = *data;
 		cout << "Available devices: \r\n";
 		for(size_t i{}; i < DEV_TYPES_NUMBER - 1; ++i) {
@@ -305,7 +305,7 @@ namespace Wk {
 					cout << "\t\tChannels Number: " << (uint32_t)*data << "\r\n";
 					break;
 			case Wk::DEV_GENERIC_IO:
-					cout << "\t\tMemory area available size: " << (uint32_t)*data << "\r\n";
+					cout << "\t\tMemory area size available: " << (uint32_t)*data << "\r\n";
 					break;
 				case Wk::DEV_SENSOR:
 					cout << "\t\tSensor Type: " << sensorTypeStr[*data] << "\r\n";
