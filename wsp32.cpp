@@ -286,7 +286,7 @@ namespace Wk {
 		cout << ">>> User Firmware Information\r\n";
 		cout << "Protocol Version: " << ((uint32_t)data[1] & 0x0F) << "\r\n";
 		auto deviceMask = *data;
-		cout << "Available devices: \r\n";
+		cout << "Available modules: \r\n";
 		for(size_t i{}; i < DEV_TYPES_NUMBER - 1; ++i) {
 			if(deviceMask & (1U << i)) {
 				cout << "\t" << deviceTypeStr[i] << "\r\n";
