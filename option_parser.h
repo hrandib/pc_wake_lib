@@ -7,6 +7,7 @@
 #include <vector>
 #include <utility>
 #include <iterator>
+#include <exception>
 
 namespace Opts {
 
@@ -21,6 +22,7 @@ namespace Opts {
 	using std::transform;
 	using std::copy;
 	using std::back_inserter;
+	using std::exception;
 
 	class Parser
 	{
@@ -153,6 +155,53 @@ namespace Opts {
 				args_[i] = argv[i + 1];
 				transform(args_[i].begin(), args_[i].end(), args_[i].begin(), ::tolower);
 			}
+		}
+	};
+
+	class ParsePortBaudrate
+	{
+	private:
+		string port_{};
+		int32_t baudRate_{};
+	public:
+		ParsePortBaudrate(Parser& parser)
+		{
+			int result;
+			vector<string> keyValues;
+			// Parse port name
+			tie(result, keyValues) = parser.Find("-p", 1);
+			if(result >= 0) {
+				if(keyValues.size()) {
+					port_ = keyValues[0];
+				}
+				else {
+					exit(1);
+				}
+			}
+			else {
+				cerr << "User should provide Port option (-p)" << endl;
+				exit(1);
+			}
+			//Parse baud rate
+			tie(result, keyValues) = parser.Find("-b", 1);
+			if(result >= 0) {
+				try {
+					baudRate_ = stoi(keyValues[0]);
+				}
+				catch(exception& e) {
+					cerr << "Baudrate value is not valid. " << e.what() << endl;
+					exit(1);
+				}
+			}
+			else {
+				baudRate_ = 9600;
+			}
+		}
+		const string& GetPort() const {
+			return port_;
+		}
+		int32_t GetBaudRate() const {
+			return baudRate_;
 		}
 	};
 
