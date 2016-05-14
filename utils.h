@@ -55,4 +55,17 @@ namespace Utils {
 		}
 	};
 
+	template<bool, typename T1, typename T2>
+	struct select_if
+	{
+		using type = T1;
+	};
+	template<typename T1, typename T2>
+	struct select_if<false, T1, T2>
+	{
+		using type = T2;
+	};
+	template<bool value, typename T1, typename T2>
+	using select_if_t = typename select_if<value, T1, T2>::type;
+
 }//Utils
