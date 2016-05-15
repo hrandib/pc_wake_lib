@@ -284,7 +284,7 @@ namespace Wk {
 		packet.n = 1; //device info request
 		auto data = &packet.payload[1];
 		cout << ">>> User Firmware Information\r\n";
-		cout << "Protocol Version: " << ((uint32_t)data[1] & 0x0F) << "\r\n";
+		cout << "Protocol Version: " << ((uint32_t)(data[1] >> 4)) << '.' << ((uint32_t)data[1] & 0x0F) << "\r\n";
 		auto deviceMask = *data;
 		cout << "Available modules: \r\n";
 		for(size_t i{}; i < DEV_TYPES_NUMBER - 1; ++i) {
