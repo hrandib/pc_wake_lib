@@ -281,7 +281,6 @@ namespace Wk {
 			std::cerr << "Common Info request failed with device response: " << GetErrorString((Err)packet.payload[0]) << endl;
 			return false;
 		}
-		packet.n = 1; //device info request
 		auto data = &packet.payload[1];
 		cout << ">>> User Firmware Information\r\n";
 		cout << "Protocol Version: " << ((uint32_t)(data[1] >> 4)) << '.' << ((uint32_t)data[1] & 0x0F) << "\r\n";
@@ -290,6 +289,7 @@ namespace Wk {
 		for(size_t i{}; i < DEV_TYPES_NUMBER - 1; ++i) {
 			if(deviceMask & (1U << i)) {
 				cout << "\t" << deviceTypeStr[i] << "\r\n";
+				packet.n = 1;										//device info request
 				packet.payload[0] = (uint8_t)i; //device select
 				if(!Request(packet, 50)) {
 					std::cerr << ">>> Device Info request failed\r\n";
@@ -308,7 +308,11 @@ namespace Wk {
 					cout << "\t\tMemory area size available: " << (uint32_t)*data << "\r\n";
 					break;
 				case Wk::DEV_SENSOR:
-					cout << "\t\tSensor Type: " << sensorTypeStr[*data] << "\r\n";
+					for(uint8_t i{}; i < sizeof(sensorTypeStr); ++i) {
+						if(*data & (1U << i)) {
+							cout << "\t\tType: " << sensorTypeStr[i] << "\r\n";
+						}
+					}
 					break;
 				case Wk::DEV_POWER_SUPPLY:
 					cout << "\t\tNominal Power: " << (uint32_t)*data << "W\r\n";
