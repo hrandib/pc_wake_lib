@@ -315,7 +315,13 @@ namespace Wk {
 					}
 					break;
 				case Wk::DEV_POWER_SUPPLY:
-					cout << "\t\tNominal Power: " << (uint32_t)*data << "W\r\n";
+					cout << "\t\tNominal Power: ";
+					if(packet.n == 2) {
+						cout << (uint32_t)*data << "W\r\n";
+					}
+					else {
+						cout << *(uint16_t*)data << "W\r\n";
+					}
 					break;
 				case Wk::DEV_RESERVED:
 					cout << "\t\tReserved" << "\r\n";
