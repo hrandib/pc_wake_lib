@@ -286,7 +286,7 @@ namespace Wk {
 		cout << "Protocol Version: " << ((uint32_t)(data[1] >> 4)) << '.' << ((uint32_t)data[1] & 0x0F) << "\r\n";
 		auto deviceMask = *data;
 		cout << "Available modules: \r\n";
-		for(size_t i{}; i < DEV_TYPES_NUMBER - 1; ++i) {
+		for(size_t i{}; i < DEV_TYPES_NUMBER; ++i) {
 			if(deviceMask & (1U << i)) {
 				cout << "\t" << deviceTypeStr[i] << "\r\n";
 				packet.n = 1;										//device info request
@@ -327,6 +327,7 @@ namespace Wk {
 					cout << "\t\tReserved" << "\r\n";
 					break;
 				case Wk::DEV_CUSTOM:
+					cout << "\t\tID: " << (uint32_t)*data << "\r\n";
 					break;
 				default:
 					break;
