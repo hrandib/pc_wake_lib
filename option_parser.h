@@ -197,9 +197,11 @@ namespace Opts {
 		}
 		void PrintDescription()
 		{
-			cout << "-p <port> examples: -p COM1 -p com99\r\n"
-				<< "-b <baud> examples: -b 19200 -b 9600\r\n"
-				<< "    default: 9600\r\n";
+			cout << "-p <port>\r\n"
+				"    examples: -p COM1 -p com99\r\n"
+				"-b <baud>\r\n"
+				"    examples: -b 19200 -b 9600\r\n"
+				"    default: 9600\r\n";
 		}
 		const string& GetPort() const {
 			return port_;
