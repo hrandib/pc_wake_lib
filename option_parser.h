@@ -143,7 +143,7 @@ namespace Opts {
 		Parser(int argc, const char* argv[]) : args_{argc - 1}
 		{
 			if(argc == 1) {
-				cerr << "The program should take at least 1 parameter, -h for help";
+				cout << "The program should take at least 1 parameter, -h for help";
 				exit(1);
 			}
 			for(int i = 0; i + 1 < argc; ++i) {
