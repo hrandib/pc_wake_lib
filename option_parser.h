@@ -51,7 +51,6 @@ namespace Opts {
 	private:
 		vector<string> args_;
 		size_t knownArgsEndPosition_{};
-
 		template<typename... Strings>
 		pair<int, size_t> Find_impl(int index, const char* str, Strings... strings)
 		{
@@ -121,13 +120,13 @@ namespace Opts {
 					auto argPosition = i;
 					const auto maxExpected = i + expectedArgsNumber;
 					if(maxExpected >= args_.size()) {
-						cerr << "Option " << str << " should have " << expectedArgsNumber << " argument(s)" << endl;
+						cerr << "Option " << str << " must have " << expectedArgsNumber << " argument(s)" << endl;
 						return{argPosition, args};
 					}
 					++i;
 					for(; i <= maxExpected; ++i) {
 						if(args_[i][0] == '-') {
-							cerr << "Option " << str << " should have " << expectedArgsNumber << " argument(s)" << endl;
+							cerr << "Option " << str << " must have " << expectedArgsNumber << " argument(s)" << endl;
 							return{argPosition, args};
 						}
 						knownArgsEndPosition_ = knownArgsEndPosition_ < i + 1 ? i + 1 : knownArgsEndPosition_;
@@ -163,14 +162,10 @@ namespace Opts {
 			}
 			return data;
 		}
-		virtual void PrintHelp() const
-		{
-			cerr << "The program should take at least 1 parameter";
-		}
 		Parser(int argc, const char* argv[]) : args_{argc - 1}
 		{
 			if(argc == 1) {
-				PrintHelp();
+				cout << "The program should take at least 1 parameter, -h for help";
 				exit(1);
 			}
 			for(int i = 0; i + 1 < argc; ++i) {
@@ -188,6 +183,9 @@ namespace Opts {
 	public:
 		ParsePortBaudrate(Parser& parser)
 		{
+			if(parser.Find("-h")) {
+				return;
+			}
 			int result;
 			vector<string> keyValues;
 			// Parse port name
@@ -218,6 +216,14 @@ namespace Opts {
 			else {
 				baudRate_ = 9600;
 			}
+		}
+		void PrintDescription()
+		{
+			cout << "-p <port>\r\n"
+				"    examples: -p COM1 -p com99\r\n"
+				"-b <baud>\r\n"
+				"    examples: -b 19200 -b 9600\r\n"
+				"    default: 9600\r\n";
 		}
 		const string& GetPort() const {
 			return port_;
