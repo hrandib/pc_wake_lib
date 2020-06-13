@@ -19,27 +19,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef ISERIALPORT_H
-#define ISERIALPORT_H
+#ifndef SERIALPORT_WIN_H
+#define SERIALPORT_WIN_H
 
-#include <stdint.h>
-#include <string_view>
+#include "iserialport.h"
+#include <string>
 
-struct ISerialPort {
-    virtual bool AccessCOM() = 0;
-    virtual bool OpenCOM() = 0;
-    virtual bool CloseCOM() = 0;
-    virtual bool SendData(const uint8_t* data, uint32_t size) = 0;
-    bool SendByte(uint8_t data)
-    {
-        return SendData(&data, 1);
-    }
-    virtual bool ReceiveByte(uint8_t& b) = 0;
-    virtual bool ResetStatus() = 0;
-    virtual bool Flush() = 0;
-    virtual bool setTimeout(uint32_t to) = 0;
+#include <windows.h>
 
-    virtual ~ISerialPort() = 0;
+class SerialPort : public ISerialPort {
+    // ISerialPort interface
+public:
+    using stringv = std::string_view;
+    SerialPort(stringv portPath, uint32_t baud);
+    bool AccessCOM() override;
+    bool OpenCOM() override;
+    bool CloseCOM() override;
+    bool SendData(const uint8_t* data, uint32_t size) override;
+    bool ReceiveByte(uint8_t& b) override;
+    bool ResetStatus() override;
+    bool Flush() override;
+    bool setTimeout(uint32_t to) override;
+
+private:
+    const std::string portName_;
+    uint32_t baud_;
+    HANDLE        hCom;       //COM handle
+    DCB           dcb;        //COM device control block
+    DCB           dcbc;       //DCB copy
+    COMMTIMEOUTS  ComTo;      //COM timeouts
+    COMMTIMEOUTS  ComToc;     //COM timeouts copy
+    DWORD errors;
+    COMSTAT status;
 };
 
-#endif // ISERIALPORT_H
+#endif // SERIALPORT_WIN_H

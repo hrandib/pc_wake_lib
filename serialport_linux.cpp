@@ -19,27 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef ISERIALPORT_H
-#define ISERIALPORT_H
 
-#include <stdint.h>
-#include <string_view>
+#include "serialport_linux.h"
 
-struct ISerialPort {
-    virtual bool AccessCOM() = 0;
-    virtual bool OpenCOM() = 0;
-    virtual bool CloseCOM() = 0;
-    virtual bool SendData(const uint8_t* data, uint32_t size) = 0;
-    bool SendByte(uint8_t data)
-    {
-        return SendData(&data, 1);
-    }
-    virtual bool ReceiveByte(uint8_t& b) = 0;
-    virtual bool ResetStatus() = 0;
-    virtual bool Flush() = 0;
-    virtual bool setTimeout(uint32_t to) = 0;
-
-    virtual ~ISerialPort() = 0;
-};
-
-#endif // ISERIALPORT_H
+SerialPort::SerialPort(stringv portPath, uint32_t baud)
+    : portName_{portPath}, baud_{baud}
+{  }
