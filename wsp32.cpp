@@ -27,7 +27,6 @@ using namespace Mcudrv;
 
 namespace Wk {
 
-
 static inline const char* getErrorString(uint8_t err) {
     return getErrorString(static_cast<Err>(err));
 }
