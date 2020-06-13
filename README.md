@@ -1,4 +1,4 @@
 # README #
 
-wake protocol support library for PC (Windows)
+Wake protocol support library for PC
 http://www.leoniv.diod.club/articles/wake/wake.html
