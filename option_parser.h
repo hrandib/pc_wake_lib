@@ -165,7 +165,7 @@ namespace Opts {
         Parser(int argc, const char* argv[]) : args_{static_cast<size_t>(argc - 1)}
         {
             if(argc == 1) {
-                cout << "The program should take at least 1 parameter, -h for help";
+                cout << "The program should take at least 1 parameter, -h for help\r\n";
                 exit(1);
             }
             for(int i = 0; i + 1 < argc; ++i) {
