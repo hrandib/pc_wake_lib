@@ -1,7 +1,15 @@
 import qbs 1.0
+import qbs.FileInfo
 
 StaticLibrary {
-    name: "wakelib"
+    name: "wake"
+
+    readonly property string PlatformPath:
+        qbs.targetOS.contains("windows") ? "win/" : "linux/"
+
+    cpp.includePaths: [
+        sourceDirectory
+    ]
 
     Group { name: "include"
         files: [
@@ -12,24 +20,19 @@ StaticLibrary {
             "wsp32.h",
         ]
     }
+
     Group { name: "source"
         files: [
             "crc8.cpp",
             "wsp32.cpp",
         ]
     }
-    Group { name: "win"
-        condition: qbs.targetOS.contains("windows")
+
+    Group { name: "serialport"
+        prefix: PlatformPath
         files: [
-            "serialport_win.h",
-            "serialport_win.cpp"
-        ]
-    }
-    Group { name: "linux"
-        condition: qbs.targetOS.contains("linux")
-        files: [
-            "serialport_linux.h",
-            "serialport_linux.cpp"
+            "serialport.h",
+            "serialport.cpp"
         ]
     }
 
@@ -37,6 +40,10 @@ StaticLibrary {
 
     Export {
         Depends { name: "cpp" }
-        cpp.includePaths: [ product.sourceDirectory ]
+        cpp.includePaths: [
+            product.sourceDirectory,
+            FileInfo.joinPaths(product.sourceDirectory,
+                               product.PlatformPath)
+        ]
     }
 }

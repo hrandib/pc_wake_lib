@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "serialport_linux.h"
+#include "serialport.h"
 
 #include <termios.h>
 #include <fcntl.h>
@@ -31,6 +31,10 @@
 SerialPort::SerialPort(stringv portPath, uint32_t baudRate)
     : portName_{portPath}, baudConstant_{getBaudConstant(baudRate)}, fd_{}
 {  }
+
+bool SerialPort::AccessCOM() {
+    return false;
+}
 
 bool SerialPort::OpenCOM()
 {
@@ -44,8 +48,24 @@ bool SerialPort::OpenCOM()
     return result && setPortAttributes();
 }
 
+bool SerialPort::CloseCOM()
+{
+    bool result = !close(fd_);
+    if(result) {
+        fd_ = 0;
+    }
+    return result;
+}
+
 bool SerialPort::setTimeout(uint32_t) {
     return true;
+}
+
+SerialPort::~SerialPort()
+{
+    if(fd_ > 0) {
+        close(fd_);
+    }
 }
 
 bool SerialPort::setPortAttributes() {
@@ -156,11 +176,6 @@ uint32_t SerialPort::getBaudConstant(uint32_t baudRate)
     }
 }
 
-bool SerialPort::CloseCOM()
-{
-    return !close(fd_);
-}
-
 bool SerialPort::WriteData(const uint8_t* data, uint32_t size)
 {
     return write(fd_, data, size) > 0;
@@ -169,4 +184,12 @@ bool SerialPort::WriteData(const uint8_t* data, uint32_t size)
 bool SerialPort::ReadData(uint8_t* data, uint32_t size)
 {
     return read(fd_, data, size) > 0;
+}
+
+bool SerialPort::ResetStatus() {
+    return true;
+}
+
+bool SerialPort::Flush() {
+    return true;
 }

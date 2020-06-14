@@ -34,7 +34,7 @@ struct ISerialPort {
     {
         return WriteData(&data, 1);
     }
-    virtual bool ReadData(uint8_t* data, uint32_t size);
+    virtual bool ReadData(uint8_t* data, uint32_t size) = 0;
     bool ReadByte(uint8_t& b) {
         return ReadData(&b, 1);
     }
@@ -42,7 +42,7 @@ struct ISerialPort {
     virtual bool Flush() = 0;
     virtual bool setTimeout(uint32_t to) = 0;
 
-    virtual ~ISerialPort() = 0;
+    virtual ~ISerialPort() = default;
 };
 
 #endif // ISERIALPORT_H

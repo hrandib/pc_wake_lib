@@ -37,7 +37,7 @@ public:
     bool ResetStatus() override;
     bool Flush() override;
     bool setTimeout(uint32_t to) override;
-
+    ~SerialPort() override;
 private:
     const std::string portName_;
     uint32_t baudConstant_;

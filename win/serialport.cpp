@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-#include "serialport_win.h"
+#include "serialport.h"
 
 SerialPort::SerialPort(stringv portPath, uint32_t baud)
     : portName_{portPath}, baud_{baud}
