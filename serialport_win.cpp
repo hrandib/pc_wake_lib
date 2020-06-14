@@ -110,14 +110,14 @@ bool SerialPort::setTimeout(uint32_t to)
     return true;
 }
 
-bool SerialPort::SendData(const uint8_t* data, uint32_t size)
+bool SerialPort::WriteData(const uint8_t* data, uint32_t size)
 {
     DWORD written;
     bool x = WriteFile(hCom, data, size, &written, NULL) != 0;
     return x && written == size;
 }
 
-bool SerialPort::ReceiveByte(unsigned char &b)
+bool SerialPort::ReadByte(unsigned char &b)
 {
     DWORD read; bool x;
     x = ReadFile(hCom, &b, 1, &read, NULL) != 0;         //read byte

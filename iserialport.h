@@ -29,12 +29,15 @@ struct ISerialPort {
     virtual bool AccessCOM() = 0;
     virtual bool OpenCOM() = 0;
     virtual bool CloseCOM() = 0;
-    virtual bool SendData(const uint8_t* data, uint32_t size) = 0;
-    bool SendByte(uint8_t data)
+    virtual bool WriteData(const uint8_t* data, uint32_t size) = 0;
+    bool WriteByte(uint8_t data)
     {
-        return SendData(&data, 1);
+        return WriteData(&data, 1);
     }
-    virtual bool ReceiveByte(uint8_t& b) = 0;
+    virtual bool ReadData(uint8_t* data, uint32_t size);
+    bool ReadByte(uint8_t& b) {
+        return ReadData(&b, 1);
+    }
     virtual bool ResetStatus() = 0;
     virtual bool Flush() = 0;
     virtual bool setTimeout(uint32_t to) = 0;

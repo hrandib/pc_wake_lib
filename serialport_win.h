@@ -35,8 +35,8 @@ public:
     bool AccessCOM() override;
     bool OpenCOM() override;
     bool CloseCOM() override;
-    bool SendData(const uint8_t* data, uint32_t size) override;
-    bool ReceiveByte(uint8_t& b) override;
+    bool WriteData(const uint8_t* data, uint32_t size) override;
+    bool ReadByte(uint8_t& b) override;
     bool ResetStatus() override;
     bool Flush() override;
     bool setTimeout(uint32_t to) override;

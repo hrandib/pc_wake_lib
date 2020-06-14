@@ -43,7 +43,7 @@ static inline const char* getErrorString(uint8_t err) {
         debugInfo_.timeoutSuccess = true;
 #endif
         for(i = 0; i < 512 && b != FEND; i++) {
-            if(!port_.ReceiveByte(b))     break;                //frame synchronization
+            if(!port_.ReadByte(b))     break;                //frame synchronization
         }
         if(b != FEND) {
             return 0;             //timeout or sync error
@@ -57,14 +57,14 @@ static inline const char* getErrorString(uint8_t err) {
         crc(b);                               //update CRC
         N = ADD = 0;
         for(i = -3; i <= N; i++) {
-            if(!port_.ReceiveByte(b)) {
+            if(!port_.ReadByte(b)) {
 #ifdef DEBUG_MODE
                 debugInfo_.syncSuccess = false;
 #endif
                 break;                //timeout error
             }
             if(b == FESC) {
-                if(!port_.ReceiveByte(b)) {
+                if(!port_.ReadByte(b)) {
 #ifdef DEBUG_MODE
                     debugInfo_.syncSuccess = false;
 #endif
@@ -158,7 +158,7 @@ static inline const char* getErrorString(uint8_t err) {
             }
             Buff[j++] = d;
         }
-        return port_.SendData(Buff, j);
+        return port_.WriteData(Buff, j);
     }
 
     bool Wake::GetInfo(Packet_t& packet)

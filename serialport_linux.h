@@ -28,19 +28,23 @@
 class SerialPort : public ISerialPort {
 public:
     using stringv = std::string_view;
-    SerialPort(stringv portPath, uint32_t baud);
+    SerialPort(stringv portPath, uint32_t baudRate);
     bool AccessCOM() override;
     bool OpenCOM() override;
     bool CloseCOM() override;
-    bool SendData(const uint8_t* data, uint32_t size) override;
-    bool ReceiveByte(uint8_t& b) override;
+    bool WriteData(const uint8_t* data, uint32_t size) override;
+    bool ReadData(uint8_t* data, uint32_t size) override;
     bool ResetStatus() override;
     bool Flush() override;
     bool setTimeout(uint32_t to) override;
 
 private:
     const std::string portName_;
-    uint32_t baud_;
+    uint32_t baudConstant_;
+    int32_t fd_;
+
+    bool setPortAttributes();
+    static uint32_t getBaudConstant(uint32_t baudRate);
 };
 
 #endif // SERIALPORT_WIN_H
