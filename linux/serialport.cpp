@@ -29,7 +29,7 @@
 #include <stdexcept>
 
 SerialPort::SerialPort(stringv portPath, uint32_t baudRate)
-    : portName_{portPath}, baudConstant_{getBaudConstant(baudRate)}, fd_{}
+    : portName_{portPath}, baudConstant_{GetBaudConstant(baudRate)}, fd_{}
 {  }
 
 bool SerialPort::AccessCOM() {
@@ -45,7 +45,7 @@ bool SerialPort::OpenCOM()
     if(fd_ > 0) {
         result = true;
     }
-    return result && setPortAttributes();
+    return result && SetPortAttributes();
 }
 
 bool SerialPort::CloseCOM()
@@ -57,7 +57,7 @@ bool SerialPort::CloseCOM()
     return result;
 }
 
-bool SerialPort::setTimeout(uint32_t) {
+bool SerialPort::SetTimeout(uint32_t) {
     return true;
 }
 
@@ -68,7 +68,7 @@ SerialPort::~SerialPort()
     }
 }
 
-bool SerialPort::setPortAttributes() {
+bool SerialPort::SetPortAttributes() {
     termios config;
     if(tcgetattr(fd_, &config) < 0) {
         return false;
@@ -138,7 +138,7 @@ bool SerialPort::setPortAttributes() {
     return true;
 }
 
-uint32_t SerialPort::getBaudConstant(uint32_t baudRate)
+uint32_t SerialPort::GetBaudConstant(uint32_t baudRate)
 {
     switch(baudRate) {
     case 50:    return 0000001;

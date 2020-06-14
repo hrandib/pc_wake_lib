@@ -38,7 +38,7 @@ static inline const char* getErrorString(uint8_t err) {
         int i;
         unsigned char b = 0;
         Crc::Crc8 crc(CRC_INIT);          //init CRC
-        port_.setTimeout(To);
+        port_.SetTimeout(To);
 #ifdef DEBUG_MODE
         debugInfo_.timeoutSuccess = true;
 #endif

@@ -36,15 +36,15 @@ public:
     bool ReadData(uint8_t* data, uint32_t size) override;
     bool ResetStatus() override;
     bool Flush() override;
-    bool setTimeout(uint32_t to) override;
+    bool SetTimeout(uint32_t to) override;
     ~SerialPort() override;
 private:
     const std::string portName_;
     uint32_t baudConstant_;
     int32_t fd_;
 
-    bool setPortAttributes();
-    static uint32_t getBaudConstant(uint32_t baudRate);
+    bool SetPortAttributes();
+    static uint32_t GetBaudConstant(uint32_t baudRate);
 };
 
 #endif // SERIALPORT_WIN_H

@@ -40,7 +40,7 @@ struct ISerialPort {
     }
     virtual bool ResetStatus() = 0;
     virtual bool Flush() = 0;
-    virtual bool setTimeout(uint32_t to) = 0;
+    virtual bool SetTimeout(uint32_t to) = 0;
 
     virtual ~ISerialPort() = default;
 };
