@@ -233,7 +233,7 @@ static inline const char* getErrorString(uint8_t err) {
         return true;
     }
 
-    const char* getErrorString(Err err)
+    const char* GetErrorString(Err err)
     {
         switch(err) {
         case ERR_NO:

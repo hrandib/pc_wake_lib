@@ -150,7 +150,7 @@ namespace Wk {
     using std::cout;
     using std::endl;
 
-    const char* getErrorString(Err err);
+    const char* GetErrorString(Err err);
 
     class Wake
     {
