@@ -27,8 +27,8 @@ using namespace Mcudrv;
 
 namespace Wk {
 
-static inline const char* getErrorString(uint8_t err) {
-    return getErrorString(static_cast<Err>(err));
+static inline const char* GetErrorString(uint8_t err) {
+    return GetErrorString(static_cast<Err>(err));
 }
     //--------------------------- Receive frame: --------------------------------
 
@@ -171,7 +171,7 @@ static inline const char* getErrorString(uint8_t err) {
         }
         if(packet.payload[0]) {
             std::cerr << "Common Info request failed with device response: "
-                      << getErrorString(packet.payload[0]) << endl;
+                      << GetErrorString(packet.payload[0]) << endl;
             return false;
         }
         auto data = &packet.payload[1];

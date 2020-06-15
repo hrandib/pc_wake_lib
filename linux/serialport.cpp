@@ -40,7 +40,7 @@ bool SerialPort::OpenCOM()
 {
     bool result = false;
     if(fd_ == 0) {
-        fd_ = open(portName_.data(), O_RDWR | O_NOCTTY | O_NDELAY);
+        fd_ = open(portName_.data(), O_RDWR | O_NOCTTY);
     }
     if(fd_ > 0) {
         result = true;

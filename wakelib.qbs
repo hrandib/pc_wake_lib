@@ -11,6 +11,10 @@ StaticLibrary {
         sourceDirectory
     ]
 
+    cpp.defines: [
+        //"DEBUG_MODE"
+    ]
+
     Group { name: "include"
         files: [
             "iserialport.h",
