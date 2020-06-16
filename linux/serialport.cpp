@@ -74,48 +74,10 @@ bool SerialPort::SetPortAttributes() {
         return false;
     }
 
-    //
-    // Input flags - Turn off input processing
-    //
-    // convert break to null byte, no CR to NL translation,
-    // no NL to CR translation, don't mark parity errors or breaks
-    // no input parity check, don't strip high bit off,
-    // no XON/XOFF software flow control
-    //
-    config.c_iflag &= static_cast<uint32_t>(~(IGNBRK | BRKINT | ICRNL |
-                        INLCR | PARMRK | INPCK | ISTRIP | IXON));
+    cfmakeraw(&config);
 
     //
-    // Output flags - Turn off output processing
-    //
-    // no CR to NL translation, no NL to CR-NL translation,
-    // no NL to CR translation, no column 0 CR suppression,
-    // no Ctrl-D suppression, no fill characters, no case mapping,
-    // no local output processing
-    //
-    // config.c_oflag &= ~(OCRNL | ONLCR | ONLRET |
-    //                     ONOCR | ONOEOT| OFILL | OLCUC | OPOST);
-    config.c_oflag = 0;
-
-    //
-    // No line processing
-    //
-    // echo off, echo newline off, canonical mode off,
-    // extended input processing off, signal chars off
-    //
-    config.c_lflag &= static_cast<uint32_t>(~(ECHO | ECHONL | ICANON | IEXTEN | ISIG));
-
-    //
-    // Turn off character processing
-    //
-    // clear current char size mask, no parity checking,
-    // no output processing, force 8 bit input
-    //
-    config.c_cflag &= static_cast<uint32_t>(~(CSIZE | PARENB));
-    config.c_cflag |= CS8;
-
-    //
-    // One input byte is enough to return from read()
+    // 300ms timeout for the packet
     // Inter-character timer off
     //
     config.c_cc[VMIN]  = 0;
