@@ -23,6 +23,7 @@
 #include "serialport.h"
 
 #include <termios.h>
+#include <sys/ioctl.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <limits.h>
@@ -43,6 +44,7 @@ bool SerialPort::OpenCOM()
         fd_ = open(portName_.data(), O_RDWR | O_NOCTTY);
     }
     if(fd_ > 0) {
+        ioctl(fd_, TIOCEXCL);
         result = true;
     }
     return result && SetPortAttributes();
