@@ -45,9 +45,9 @@ StaticLibrary {
     Export {
         Depends { name: "cpp" }
         cpp.includePaths: [
-            product.sourceDirectory,
-            FileInfo.joinPaths(product.sourceDirectory,
-                               product.PlatformPath)
+            exportingProduct.sourceDirectory,
+            FileInfo.joinPaths(exportingProduct.sourceDirectory,
+                               exportingProduct.PlatformPath)
         ]
     }
 }
