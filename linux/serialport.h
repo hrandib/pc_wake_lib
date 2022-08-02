@@ -25,7 +25,8 @@
 #include "iserialport.h"
 #include <string>
 
-class SerialPort : public ISerialPort {
+class SerialPort : public ISerialPort
+{
 public:
     using stringv = std::string_view;
     SerialPort(stringv portPath, uint32_t baudRate);

@@ -27,7 +27,8 @@
 
 #include <windows.h>
 
-class SerialPort : public ISerialPort {
+class SerialPort : public ISerialPort
+{
     // ISerialPort interface
 public:
     using stringv = std::string_view;
@@ -40,15 +41,14 @@ public:
     bool ResetStatus() override;
     bool Flush() override;
     bool setTimeout(uint32_t to) override;
-
 private:
     const std::string portName_;
     uint32_t baud_;
-    HANDLE        hCom;       //COM handle
-    DCB           dcb;        //COM device control block
-    DCB           dcbc;       //DCB copy
-    COMMTIMEOUTS  ComTo;      //COM timeouts
-    COMMTIMEOUTS  ComToc;     //COM timeouts copy
+    HANDLE hCom;         // COM handle
+    DCB dcb;             // COM device control block
+    DCB dcbc;            // DCB copy
+    COMMTIMEOUTS ComTo;  // COM timeouts
+    COMMTIMEOUTS ComToc; // COM timeouts copy
     DWORD errors;
     COMSTAT status;
 };

@@ -25,7 +25,8 @@
 #include <stdint.h>
 #include <string_view>
 
-struct ISerialPort {
+struct ISerialPort
+{
     virtual bool AccessCOM() = 0;
     virtual bool OpenCOM() = 0;
     virtual bool CloseCOM() = 0;
@@ -35,7 +36,8 @@ struct ISerialPort {
         return WriteData(&data, 1);
     }
     virtual bool ReadData(uint8_t* data, uint32_t size) = 0;
-    bool ReadByte(uint8_t& b) {
+    bool ReadByte(uint8_t& b)
+    {
         return ReadData(&b, 1);
     }
     virtual bool ResetStatus() = 0;

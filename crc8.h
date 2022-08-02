@@ -28,7 +28,7 @@
 
 #undef FORCEINLINE
 #ifdef __IAR_SYSTEMS_ICC__
-#define FORCEINLINE #pragma inline=forced
+#define FORCEINLINE #pragma inline = forced
 #else
 #define FORCEINLINE
 #endif
@@ -36,7 +36,7 @@
 namespace Mcudrv {
 namespace Crc {
 
-//Maxim-Dallas computation (X8 + X5 + X4 + 1)
+// Maxim-Dallas computation (X8 + X5 + X4 + 1)
 class Crc8
 {
 private:
@@ -45,7 +45,7 @@ private:
     uint8_t crc_;
 public:
     Crc8(uint8_t init = 0) : crc_(init)
-    {	}
+    { }
     void Init(uint8_t init)
     {
         crc_ = init;
@@ -62,8 +62,7 @@ public:
     }
     Self& operator()(const uint8_t* buf, uint8_t len)
     {
-        for(uint8_t i = 0; i < len; ++i)
-        {
+        for(uint8_t i = 0; i < len; ++i) {
             crc_ = table[crc_ ^ buf[i]];
         }
         return *this;
@@ -100,7 +99,8 @@ struct Crc8_Algo2
             if((inByte ^ crc) & 1) {
                 crc = ((crc ^ 0x18) >> 1) | 0x80;
             }
-            else crc = (crc >> 1) & ~0x80;
+            else
+                crc = (crc >> 1) & ~0x80;
     }
 };
 
@@ -111,11 +111,11 @@ private:
     typedef Crc8 Self;
     uint8_t crc_;
 public:
-//  Crc8(uint8_t init = 0) : crc_(init)
-//	{	}
+    //  Crc8(uint8_t init = 0) : crc_(init)
+    //	{	}
     void Init(uint8_t init)
     {
-      crc_ = init;
+        crc_ = init;
     }
     Self& Reset(uint8_t init = 0)
     {
@@ -129,10 +129,9 @@ public:
     }
     Self& operator()(const uint8_t* buf, uint8_t len)
     {
-        for(uint8_t i = 0; i < len; ++i)
-        {
-          operator()(buf[i]);
-//        Algo::Evaluate(crc_, buf[i]);
+        for(uint8_t i = 0; i < len; ++i) {
+            operator()(buf[i]);
+            //        Algo::Evaluate(crc_, buf[i]);
         }
         return *this;
     }
@@ -142,12 +141,11 @@ public:
     }
 };
 
-}//NoLUT
+} // NoLUT
 
 typedef NoLUT::Crc8<NoLUT::Crc8_Algo1> Crc8_NoLUT;
 
-}//Crc
-}//Mcudrv
+} // Crc
+} // Mcudrv
 
 #endif // CRC_H
-
