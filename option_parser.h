@@ -160,16 +160,14 @@ public:
         }
         return data;
     }
-    Parser(int argc, const char* argv[]) : args_{static_cast<size_t>(argc - 1)}
+    Parser(int argc, const char* argv[])
     {
         if(argc == 1) {
             cout << "The program should take at least 1 parameter, -h for help\r\n";
             exit(1);
         }
-        for(int i = 0; i + 1 < argc; ++i) {
-            args_[i] = argv[i + 1];
-            transform(args_[i].begin(), args_[i].end(), args_[i].begin(), ::tolower);
-        }
+        args_.reserve(static_cast<size_t>(argc - 1));
+        args_.insert(args_.cbegin(), &argv[1], &argv[argc]);
     }
 };
 
