@@ -36,6 +36,9 @@ static inline const char* GetErrorString(uint8_t err)
 bool Wake::RxFrame(uint32_t To, uint8_t& ADD, uint8_t& CMD, uint8_t& N, uint8_t* Data)
 {
     using namespace std;
+    if(ADD == ADDR_BROADCAST || (ADDR_GROUP_MIN <= ADD && ADD <= ADDR_GROUP_MAX)) {
+        return true;
+    }
     int i;
     unsigned char b = 0;
     Crc::Crc8 crc(CRC_INIT); // init CRC

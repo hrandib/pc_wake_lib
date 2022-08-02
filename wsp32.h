@@ -123,6 +123,8 @@ enum SensorType {
 constexpr static std::array<const char*, SEN_TYPES_NUMBER> sensorTypeStr =
   {"Temperature", "Humidity", "Pressure", "Light", "CO2", "Presence", "Water Leak"};
 
+enum AddressTypes { ADDR_BROADCAST = 0, ADDR_GROUP_MIN = 80, ADDR_GROUP_MAX = 95 };
+
 struct Packet_t
 {
     static constexpr size_t BUF_SIZE = 160;
