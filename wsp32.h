@@ -125,6 +125,8 @@ constexpr static std::array<const char*, SEN_TYPES_NUMBER> sensorTypeStr =
 
 struct Packet_t
 {
+    static constexpr size_t BUF_SIZE = 160;
+
     using Self = Packet_t;
     Packet_t() = default;
     Packet_t(Packet_t&& packet) = default;
@@ -135,10 +137,10 @@ struct Packet_t
     {
         std::copy(data.begin(), data.end(), payload.begin());
     }
-    uint8_t addr;
-    uint8_t cmd;
-    uint8_t n;
-    std::array<uint8_t, 160> payload;
+    uint8_t addr{};
+    uint8_t cmd{};
+    uint8_t n{};
+    std::array<uint8_t, BUF_SIZE> payload{};
 };
 
 using std::cout;
@@ -156,7 +158,8 @@ private:
         TFEND = 0xDC, // Transposed Frame END
         TFESC = 0xDD, // Transposed Frame ESCape
 
-        CRC_INIT = 0xDE // CRC Initial value
+        CRC_INIT = 0xDE, // CRC Initial value
+        DEFAULT_RX_TIMEOUT_MS = 50
     };
 
     ISerialPort& port_;
@@ -182,12 +185,9 @@ public:
     }
     bool GetInfo(Packet_t& packet);
 #ifndef DEBUG_MODE
-    bool Request(Packet_t& packet, uint32_t To = 50)
+    bool Request(Packet_t& packet, uint32_t To = DEFAULT_RX_TIMEOUT_MS)
     {
-        if(TxFrame(packet) && RxFrame(packet, To)) {
-            return true;
-        }
-        return false;
+        return TxFrame(packet) && RxFrame(packet, To);
     }
 #else // DEBUG_MODE
     auto Request(Packet_t& packet, uint32_t To)
@@ -205,11 +205,11 @@ public:
         return debugInfo_;
     }
 #endif
-    uint8_t GetTxCrc()
+    uint8_t GetTxCrc() const
     {
         return TxCrc_;
     }
-    uint8_t GetRxCrc()
+    uint8_t GetRxCrc() const
     {
         return RxCrc_;
     }
