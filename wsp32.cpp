@@ -37,6 +37,7 @@ bool Wake::RxFrame(uint32_t To, uint8_t& ADD, uint8_t& CMD, uint8_t& N, uint8_t*
 {
     using namespace std;
     if(ADD == ADDR_BROADCAST || (ADDR_GROUP_MIN <= ADD && ADD <= ADDR_GROUP_MAX)) {
+        N = 0;
         return true;
     }
     int i;
